@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,15 +14,11 @@ import (
 
 // GitHubAuth is start of OAuth webflow
 func GitHubAuth(w http.ResponseWriter, r *http.Request) {
-	scopes := []string{"user:email", "repo"}
-	githubConf := newGithubConf(scopes)
-
-	state := "auth-" + uuid.Must(uuid.NewV4()).String()
-	sessionData.StateMap[state] = strings.Join(scopes, ",")
-
-	url := githubConf.AuthCodeURL(state, oauth2.AccessTypeOnline)
-	log.Println("url: ", url)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	if os.Getenv("GHA") == "yes" {
+		installAppFlow(w, r)
+		return
+	}
+	oauthFlow(w, r)
 }
 
 // GitHubAuthCallback exchanges code for token
@@ -51,4 +48,24 @@ func newGithubConf(scope []string) *oauth2.Config {
 		Scopes:       scope,
 		Endpoint:     githuboauth.Endpoint,
 	}
+}
+
+func oauthFlow(w http.ResponseWriter, r *http.Request) {
+	scopes := []string{"user:email", "repo"}
+	githubConf := newGithubConf(scopes)
+
+	state := "auth-" + uuid.Must(uuid.NewV4()).String()
+	sessionData.StateMap[state] = strings.Join(scopes, ",")
+
+	url := githubConf.AuthCodeURL(state, oauth2.AccessTypeOnline)
+	log.Println("url: ", url)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func installAppFlow(w http.ResponseWriter, r *http.Request) {
+	appName := os.Getenv("GITHUB_APP_NAME")
+	state := uuid.Must(uuid.NewV4()).String()
+	installURL := fmt.Sprintf("https://github.com/apps/%s/installations/new?state=%s", appName, state)
+	log.Println("redirecting to: ", installURL)
+	http.Redirect(w, r, installURL, http.StatusTemporaryRedirect)
 }

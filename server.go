@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -28,13 +29,16 @@ type Server interface {
 	Start()
 }
 
-// NewDefaultServer creates default Server
-func NewDefaultServer() (Server, error) {
-	return NewServer(&ServerOptions{Port: defaultPort})
+// NewServer creates Server
+func NewServer() (Server, error) {
+	port, err := strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
+		port = defaultPort
+	}
+	return newServer(&ServerOptions{Port: port})
 }
 
-// NewServer creates Server
-func NewServer(opts *ServerOptions) (Server, error) {
+func newServer(opts *ServerOptions) (Server, error) {
 	addr := fmt.Sprintf("%s:%d", allLocal, opts.Port)
 
 	router := mux.NewRouter()
@@ -43,6 +47,8 @@ func NewServer(opts *ServerOptions) (Server, error) {
 
 	return &server{opts: opts, router: router, http: http}, nil
 }
+
+// Implementation
 
 type server struct {
 	opts   *ServerOptions
@@ -71,4 +77,6 @@ func (s *server) Start() {
 
 func (s *server) setupRoutes() {
 	s.router.HandleFunc("/", routes.Index)
+	s.router.HandleFunc("/auth", routes.GitHubAuth).Methods("GET")
+	s.router.HandleFunc("/oauth/callback", routes.GitHubAuthCallback).Methods("GET")
 }

@@ -7,7 +7,9 @@ import (
 )
 
 func main() {
-	server, err := authplay.NewDefaultServer()
+	// log filename and line numbers
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	server, err := authplay.NewServer()
 	if err != nil {
 		log.Fatalf("%#v", err)
 	}

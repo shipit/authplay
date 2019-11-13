@@ -13,7 +13,7 @@ import (
 
 // GitHubAuth is start of OAuth webflow
 func GitHubAuth(w http.ResponseWriter, r *http.Request) {
-	scopes := []string{"user:email"}
+	scopes := []string{"user:email", "repo"}
 	githubConf := newGithubConf(scopes)
 
 	state := "auth-" + uuid.Must(uuid.NewV4()).String()

@@ -4,7 +4,12 @@ Simple project to exercise `OAuth` web flows.
 
 ## Changelog
 
-Starts server and listens on port `8888`, returns simple string for `/` path. It's the only path atm.
+Starts server and listens on port `8888`
+
+`/` returns login form or session data post OAuth
+`/` also returns response for `/users` and `/user/repos/`
+
+`/graphql` returns json encoded data for custom queries
 
 ## To Run
 

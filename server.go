@@ -79,4 +79,5 @@ func (s *server) setupRoutes() {
 	s.router.HandleFunc("/", routes.Index)
 	s.router.HandleFunc("/auth", routes.GitHubAuth).Methods("GET")
 	s.router.HandleFunc("/oauth/callback", routes.GitHubAuthCallback).Methods("GET")
+	s.router.HandleFunc("/graphql", routes.GraphQL).Methods("GET")
 }

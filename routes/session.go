@@ -20,6 +20,9 @@ const sessionTemplate = `
 					<li>Token: {{ .AccessToken }}</li>
 					<li>Scope: {{ .Scope }}</li>
 				</ul>
+				<div>
+					<a href="/graphql" target="_blank">Run GraphQL</a>
+				</div>
 			</div>
 		{{ else }}
 			<div>

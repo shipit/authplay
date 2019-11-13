@@ -1,7 +1,13 @@
 package api
 
 import (
+	"bytes"
 	"context"
+	"io"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
 
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
@@ -35,11 +41,13 @@ type GQLRepo struct {
 	} `json:"owner"`
 
 	Languages struct {
-		Nodes []GQLNode `json:"nodes"`
+		Nodes []*GQLNode `json:"nodes"`
 	} `graphql:"languages(first: 4)" json:"languages"`
+
 	Collaborators struct {
 		Nodes []GQLUser `json:"nodes"`
 	} `json:"collaborators"`
+
 	DefaultBranchRef struct {
 		Name   string `json:"name"`
 		Target struct {
@@ -92,7 +100,7 @@ func QueryRepos(token string) ([]GQLRepo, error) {
 					HasNextPage bool
 					EndCursor   githubv4.String
 				}
-			} `graphql:"repositories(first: 100, after: $reposCursor, ownerAffiliations:OWNER, orderBy:{field: NAME, direction: ASC})"`
+			} `graphql:"repositories(first: 100, after: $reposCursor, orderBy:{field: NAME, direction: ASC})"`
 		}
 	}
 
@@ -123,9 +131,34 @@ func QueryRepos(token string) ([]GQLRepo, error) {
 	return allRepos, nil
 }
 
+type wrapped struct {
+	base http.RoundTripper
+}
+
+func (w wrapped) RoundTrip(r *http.Request) (*http.Response, error) {
+	log.Print(r.URL)
+	resp, err := w.base.RoundTrip(r)
+	if err != nil {
+		return resp, err
+	}
+
+	reader := io.TeeReader(resp.Body, os.Stderr)
+	buf, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return resp, err
+	}
+	log.Println(string(buf))
+
+	resp.Body = ioutil.NopCloser(bytes.NewReader(buf))
+	return w.base.RoundTrip(r)
+}
+
 func newGQLClient(token string) (*githubv4.Client, error) {
 	src := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+
 	http := oauth2.NewClient(context.Background(), src)
+	http.Transport = wrapped{base: http.Transport}
+
 	client := githubv4.NewClient(http)
 
 	return client, nil

@@ -16,8 +16,11 @@ Starts server and listens on port `8888`
 ## To Run
 
 ```bash
+#!/bin/bash
 cd test
-GITHUB_CLIENT_ID=<client_id> GITHUB_CLIENT_SECRET=<client_secret> go run test_server.go
+GITHUB_CLIENT_ID=<client_id> GITHUB_CLIENT_SECRET=<client_secret> GITHUB_APP_ID=<app_id> GITHUB_APP_NAME=<app_name> GHA="yes|no" go run test_server.go
 ```
+
+`GHA=yes` triggers GitHub App install and redirect to OAuth flow.
 
 `CTRL-C` to kill the server, it captures `SIGINT` and cleans up.

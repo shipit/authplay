@@ -33,9 +33,11 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 type gqlResponse struct {
-	User *api.GQLUser `json:"user"`
+	User  *api.GQLUser  `json:"user"`
+	Repos []api.GQLRepo `json:"repos"`
 }
 
+// GraphQL maps /graphql
 func GraphQL(w http.ResponseWriter, r *http.Request) {
 	user, err := api.QueryUser(sessionData.AccessToken)
 	if err != nil {
@@ -44,8 +46,16 @@ func GraphQL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	repos, err := api.QueryRepos(sessionData.AccessToken)
+	if err != nil {
+		log.Printf("repos error: %#v", err)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	resp := gqlResponse{
-		User: user,
+		User:  user,
+		Repos: repos,
 	}
 
 	buf, err := json.Marshal(resp)

@@ -9,7 +9,7 @@ Starts server and listens on port `8888`
 `/` returns login form or session data post OAuth
 `/` also returns response for `/users` and `/user/repos/`
 
-`/graphql` returns json encoded data for custom queries
+`/graphql` returns json encoded data for custom queries, only to be accessed after GitHub auth flow on `/`
 
 ## To Run
 

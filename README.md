@@ -1,6 +1,6 @@
 # Auth N Play
 
-[![Discord](https://img.shields.io/discord/586999333447270440.svg)](https://discord.gg/9AmwHdm)
+[![Discord](https://img.shields.io/discord/639591447569498133)](https://discord.gg/9AmwHdm)
 
 Simple project to exercise `OAuth` web flows.
 

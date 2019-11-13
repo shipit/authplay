@@ -10,11 +10,19 @@ const sessionTemplate = `
 		<title>{{ .Title }}</title>
 	</head>
 	<body>
-		{{if .User}}
+		{{ if .User }}
 			<div>
-				<span>Login: {{ .Login }}</span>
+				<h4>User</h4>
+				<ul>
+					<li>Login: {{ .User.Login }}</li>
+					<li>Name: {{ .User.Name }}</li>
+					<li>Avatar URL: {{ .User.AvatarURL }}</li>
+				</ul>
 			</div>
-		{{else}}
+			{{ if .UserJSON }}
+				<code>{{ .UserJSON }}</code>
+			{{ end }}
+		{{ else }}
 			<div>
 				<form action="/auth" method="GET">
 					<button>GitHub Login</button>
@@ -39,7 +47,8 @@ type SessionData struct {
 	Title string
 	Items []string
 
-	User *github.User
+	User     *github.User
+	UserJSON *string
 
 	AccessToken string
 	StateMap    map[string]string

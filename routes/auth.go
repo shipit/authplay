@@ -38,6 +38,7 @@ func GitHubAuthCallback(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("github token: ", token, " granted scope: ", token.Extra("scope"))
 	sessionData.AccessToken = token.AccessToken
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
 
 func newGithubConf(scope []string) *oauth2.Config {

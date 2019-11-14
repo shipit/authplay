@@ -41,6 +41,17 @@ func runReposTest(token string) *string {
 	return marshal(repos)
 }
 
+func runInstalledReposTest(token string) *string {
+	repos, err := api.GetInstalledRepos(token)
+	if err != nil {
+		log.Printf("installed repos error: %#v\n", err)
+		return nil
+	}
+
+	sessionData.InstalledRepos = repos
+	return marshal(repos)
+}
+
 func marshal(in interface{}) *string {
 	buf, err := json.Marshal(in)
 	if err != nil {

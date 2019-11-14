@@ -77,7 +77,14 @@ func (s *server) Start() {
 
 func (s *server) setupRoutes() {
 	s.router.HandleFunc("/", routes.Index)
+	s.router.HandleFunc("/session", routes.DumpSession)
+
 	s.router.HandleFunc("/auth", routes.GitHubAuth).Methods("GET")
 	s.router.HandleFunc("/oauth/callback", routes.GitHubAuthCallback).Methods("GET")
+
 	s.router.HandleFunc("/graphql", routes.GraphQL).Methods("GET")
+
+	s.router.HandleFunc("/install_app", routes.GitHubAppInstall).Methods("GET")
+	s.router.HandleFunc("/post_install", routes.GitHubAppPostInstall).Methods("GET")
+	s.router.HandleFunc("/webhook", routes.GitHubAppWebhook).Methods("POST")
 }

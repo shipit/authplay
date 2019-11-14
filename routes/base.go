@@ -9,6 +9,18 @@ import (
 	"github.com/shipit/authplay/api"
 )
 
+// DumpSession dumps SessionData
+func DumpSession(w http.ResponseWriter, r *http.Request) {
+	buf, err := json.Marshal(sessionData)
+	if err != nil {
+		log.Fatalf("%#v", err)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(buf)
+}
+
 // Index is for /
 func Index(w http.ResponseWriter, r *http.Request) {
 	t, err := template.New("index").Parse(sessionTemplate)
@@ -72,4 +84,8 @@ func GraphQL(w http.ResponseWriter, r *http.Request) {
 func runTests(token string) {
 	sessionData.UserJSON = runUserTest(token)
 	sessionData.ReposJSON = runReposTest(token)
+
+	if sessionData.InstallID != nil {
+		sessionData.InstalledReposJSON = runInstalledReposTest(token)
+	}
 }

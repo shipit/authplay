@@ -23,6 +23,9 @@ const sessionTemplate = `
 				<div>
 					<a href="/graphql" target="_blank">Run GraphQL</a>
 				</div>
+				<div>
+					<a href="/install_app">Add Repos</a>
+				</div>
 			</div>
 		{{ else }}
 			<div>
@@ -35,6 +38,10 @@ const sessionTemplate = `
 			<h5>User</h5>
 			<code>{{ .UserJSON }}</code>
 		{{ end }}
+		{{ if .InstalledReposJSON }}
+			<h5>Installed Repos</h5>
+			<code>{{ .InstalledReposJSON }}</code>
+		{{ end }}
 		{{ if .ReposJSON }}
 			<h5>Repos</h5>
 			{{ if .Repos }}
@@ -46,42 +53,32 @@ const sessionTemplate = `
 			{{ end }}
 			<code>{{ .ReposJSON }}</code>
 		{{ end }}
-		{{range .Items}}
-		<div>
-			{{ . }}
-		</div>
-		{{ else }}
-		<div>
-			<strong>no items</strong>
-		</div>
-		{{ end }}
 	</body>
 </html>
 `
 
 // SessionData to transform index template
 type SessionData struct {
-	Title string
-	Items []string
+	Title string `json:"-"`
 
-	User     *github.User
-	UserJSON *string
+	User     *github.User `json:"user"`
+	UserJSON *string      `json:"-"`
 
-	Repos        []*github.Repository
-	ReposJSON    *string
-	PublicRepos  int
-	PrivateRepos int
+	Repos        []*github.Repository `json:"repos"`
+	ReposJSON    *string              `json:"-"`
+	PublicRepos  int                  `json:"-"`
+	PrivateRepos int                  `json:"-"`
 
-	AccessToken string
-	StateMap    map[string]string
-	Scope       string
+	AccessToken string            `json:"access_token"`
+	StateMap    map[string]string `json:"state_map"`
+	Scope       string            `json:"scope"`
+
+	InstallID          *int64               `json:"install_id"`
+	InstalledRepos     []*github.Repository `json:"installed_repos"`
+	InstalledReposJSON *string              `json:"-"`
 }
 
 var sessionData = SessionData{
-	Title: "Don't Panic",
-	Items: []string{
-		"One thing",
-		"And the other thing",
-	},
+	Title:    "Don't Panic",
 	StateMap: map[string]string{},
 }

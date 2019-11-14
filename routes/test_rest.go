@@ -41,8 +41,8 @@ func runReposTest(token string) *string {
 	return marshal(repos)
 }
 
-func runInstalledReposTest(token string) *string {
-	repos, err := api.GetInstalledRepos(token)
+func runInstalledReposTest(token string, installID *int64) *string {
+	repos, err := api.GetInstalledRepos(token, installID)
 	if err != nil {
 		log.Printf("installed repos error: %#v\n", err)
 		return nil

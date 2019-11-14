@@ -85,7 +85,15 @@ func runTests(token string) {
 	sessionData.UserJSON = runUserTest(token)
 	sessionData.ReposJSON = runReposTest(token)
 
-	if sessionData.InstallID != nil {
-		sessionData.InstalledReposJSON = runInstalledReposTest(token)
+	installID, err := api.GetInstallationID(token)
+	if err != nil {
+		log.Printf("installID fetch err: %#v\n", err)
+		return
+	}
+
+	log.Println("installID: ", *installID)
+	if installID != nil {
+		sessionData.InstallID = installID
+		sessionData.InstalledReposJSON = runInstalledReposTest(token, installID)
 	}
 }

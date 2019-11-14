@@ -39,28 +39,38 @@ func GetRepos(token string) ([]*github.Repository, error) {
 	return repos, err
 }
 
-// GetInstalledRepos returns the repos the GitHub App is installed on
-func GetInstalledRepos(token string) ([]*github.Repository, error) {
+// GetInstallationID grabs install_id for the user
+func GetInstallationID(token string) (*int64, error) {
 	ctx := context.Background()
 	client, _ := newClient(token)
-	list, _, err := client.Apps.ListInstallations(ctx, nil)
+	list, _, err := client.Apps.ListUserInstallations(ctx, nil)
 	if err != nil {
 		log.Printf("%#v", err)
 		return nil, err
 	}
 
-	var allRepos []*github.Repository
+	var installID int64
 	for _, installation := range list {
-		installID := installation.ID
-		repos, _, err := client.Apps.ListUserRepos(ctx, *installID, nil)
-		if err != nil {
-			log.Printf("%#v", err)
-			continue
+		if installation.ID != nil {
+			installID = *installation.ID
+			break
 		}
-		allRepos = append(allRepos, repos...)
 	}
 
-	return allRepos, nil
+	return &installID, err
+}
+
+// GetInstalledRepos returns the repos the GitHub App is installed on
+func GetInstalledRepos(token string, installID *int64) ([]*github.Repository, error) {
+	ctx := context.Background()
+	client, _ := newClient(token)
+	repos, _, err := client.Apps.ListUserRepos(ctx, *installID, nil)
+	if err != nil {
+		log.Printf("%#v", err)
+		return nil, err
+	}
+
+	return repos, nil
 }
 
 func newClient(token string) (*github.Client, error) {

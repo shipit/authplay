@@ -90,6 +90,28 @@ func QueryUser(token string) (*GQLUser, error) {
 	return &query.Viewer.GQLUser, nil
 }
 
+// QueryRepoByName fetches repo details, for an installation the repo must be added to it
+func QueryRepoByName(token string, repo string) (*GQLRepo, error) {
+	var query struct {
+		Viewer struct {
+			GQLRepo `graphql:"repository(name: $repoName)"`
+		}
+	}
+
+	variables := map[string]interface{}{
+		"repoName": githubv4.String(repo),
+	}
+
+	ctx := context.Background()
+	client, _ := newGQLClient(token)
+	err := client.Query(ctx, &query, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	return &query.Viewer.GQLRepo, nil
+}
+
 // QueryRepos runs custom query for repos and their commits, collaborators, and root tree on default branch
 func QueryRepos(token string) ([]GQLRepo, error) {
 	var query struct {

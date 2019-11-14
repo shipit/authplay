@@ -59,9 +59,8 @@ func GraphQL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var repos []*api.GQLRepo
-	if sessionData.InstalledRepos != nil && len(sessionData.InstalledRepos) > 0 {
-		repoName := sessionData.InstalledRepos[0].Name
-		repo, err := api.QueryRepoByName(sessionData.AccessToken, *repoName)
+	for _, r := range sessionData.InstalledRepos {
+		repo, err := api.QueryRepoByName(sessionData.AccessToken, *r.Name)
 		if err != nil {
 			log.Printf("repo error: %#v\n", err)
 			w.WriteHeader(http.StatusNotFound)
